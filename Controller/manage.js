@@ -10,7 +10,7 @@ const fs = require("fs");
 const path = require("path");
 const { log } = require("console");
 const SaveRiddle = require("../Schema/savedRiddle");
-const bcryptjs = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const transporter = require('../Utils/mail_transporter');
 const User = require("../Schema/userSchema");
 const { request } = require("http");
@@ -58,7 +58,7 @@ router.post('/resgistration', async (req, res) => {
         }
         const otp = Math.floor(100000 + Math.random() * 900000);
         console.log(otp);
-        const hashedPassword = await bcryptjs.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await new User({
             email,
             password: hashedPassword,
@@ -107,7 +107,7 @@ router.post('/login', async (req, res) => {
             return res.json({ message: 'username didn"t match' });
         }
         if (user) {
-            const passwordMatch = await bcryptjs.compare(password, user.password);
+            const passwordMatch = await bcrypt.compare(password, user.password);
             if (!passwordMatch) {
                 return res.json({ message: 'password didn"t match' });
             }
@@ -166,7 +166,7 @@ router.post('/confirm-reset-password', async (req, res) => {
         if (!valid) {
             return res.status(400).json({ message: 'otp does not exist.' });
         }
-        const hashedPassword = await bcryptjs.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
         const result = await User.updateOne({ _id: valid._id }, { password: hashedPassword });
         console.log(result);
         return res.status(200).json({ message: 'Password reset successfully' });
